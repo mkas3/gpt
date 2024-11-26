@@ -10,14 +10,14 @@ import Reanimated, {
 } from 'react-native-reanimated';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import styled from 'styled-components/native';
-import { BackgroundAnimation } from '../../Background';
 import { View } from '../../Styled/View';
 import { StyledProps } from '../../../types/theme.types';
 import { useTheme } from '../../../hooks/Theme/useTheme';
 import { Label } from '../Label';
 import { usePathname, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import {SafeAreaView, useWindowDimensions} from 'react-native';
+import { SafeAreaView, useWindowDimensions } from 'react-native';
+import { BackgroundSVGAnimation } from '../../Background/BackgroundSVGAnimation';
 
 const Styled = styled(Reanimated.View)<{ hidden: boolean }>`
   position: absolute;
@@ -48,13 +48,12 @@ const BackgroundTab = styled(View)<StyledProps>`
   right: 0;
 `;
 
-const BackgroundAnimationWrapper = styled(Reanimated.View)<{ hidden: boolean, height: number }>`
+const BackgroundAnimationWrapper = styled(Reanimated.View)`
   position: absolute;
-  display: ${({ hidden }) => (hidden ? 'none' : 'block')};
-  bottom: -875%;
-  height: 1200%;
-  right: -100%;
-  left: -100%;
+  bottom: -700%;
+  height: 1000%;
+  right: 0;
+  left: 0;
   pointer-events: none;
 `;
 
@@ -164,12 +163,8 @@ export const TabBar = ({
         })}
       </Routes>
       <BackgroundTabView>
-        <BackgroundAnimationWrapper
-          height={height}
-          layout={Layout.duration(200)}
-          hidden={hidden}
-        >
-          <BackgroundAnimation />
+        <BackgroundAnimationWrapper>
+          <BackgroundSVGAnimation />
         </BackgroundAnimationWrapper>
         <BackgroundTab styledTheme={theme} />
       </BackgroundTabView>

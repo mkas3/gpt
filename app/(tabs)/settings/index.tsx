@@ -16,7 +16,6 @@ import { StyledProps } from '../../../types/theme.types';
 import { useTheme } from '../../../hooks/Theme/useTheme';
 import { TouchableOpacity } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
-import { BackgroundAnimation } from '../../../components/Background';
 import { TitleWrapper } from '../../../components/Styled/Text/Title/TitleWrapper';
 import Reanimated, {
   Easing,
@@ -27,6 +26,7 @@ import Reanimated, {
 import {useUser} from '../../../hooks/User/useUser';
 import {PageRevealWrapper} from '../../../components/Tabs/Pages/PageRevealWrapper';
 import {defaultTimingConfig, defaultTimingEasing} from '../../../constants/animation';
+import {BackgroundSVGAnimation} from '../../../components/Background/BackgroundSVGAnimation';
 
 const MainView = styled(PageRevealWrapper)`
   height: 100%;
@@ -121,7 +121,7 @@ export default function SettingsMainScreen() {
   return (
     <MainView pagePaths={['/settings', '/settings/qr']}>
       <QRBackgroundWrapper style={qrOpacityStyle}>
-        <BackgroundAnimation />
+        <BackgroundSVGAnimation />
       </QRBackgroundWrapper>
       <HeaderView style={settingsOpacityStyle}>
         <TouchableOpacity onPress={openQR}>

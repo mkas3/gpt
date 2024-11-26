@@ -1,4 +1,3 @@
-import { checkAuth, getStorageUser } from '../../../services/auth.service';
 import { useUserStore } from '../../../store/User/user.store';
 import React, { useEffect } from 'react';
 import { SplashScreen, useRouter } from 'expo-router';
@@ -12,7 +11,8 @@ import Reanimated, {
   SlideOutDown,
   SlideOutUp,
 } from 'react-native-reanimated';
-import { interval, timer } from 'rxjs';
+import { concatMap, from, iif, interval, map, of, tap, timer } from 'rxjs';
+import {logout} from '../../../services/auth.service';
 
 type AuthProviderProps = {
   children?: React.ReactNode;
@@ -38,32 +38,46 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [
     hasNetworkConnection,
     revalidateUser,
-    setUser,
     setHasNetworkConnection,
+    fetchStorageUser,
+    setInitialized
   ] = useUserStore((state) => [
     state.hasNetworkConnection,
     state.revalidateUser,
-    state.setUser,
     state.setHasNetworkConnection,
+    state.fetchStorageUser,
+    state.setInitialized,
   ]);
   const router = useRouter();
 
   useEffect(() => {
-    const subscription = timer(0, 3000).subscribe(() => {
-      Network.getNetworkStateAsync().then(async (network) => {
-        if (useUserStore.getState().user) return;
-        setHasNetworkConnection(network.isConnected ?? false);
-        if (network.isConnected) {
-          if (!revalidateUser()) router.push('/first-start');
-          SplashScreen.hideAsync();
-        } else {
-          const storageUser = await getStorageUser();
-          if (!storageUser) router.push('/first-start');
-          else setUser(storageUser, true);
-          SplashScreen.hideAsync();
-        }
-      });
-    });
+    const subscription = timer(0, 3000)
+      .pipe(
+        concatMap(() =>
+          from(Network.getNetworkStateAsync()).pipe(
+            map((network) => {
+              if (!useUserStore.getState().initialized) {
+                SplashScreen.hideAsync();
+                setInitialized();
+              }
+              else if (hasNetworkConnection === network.isConnected)
+                return of(false);
+              setHasNetworkConnection(network.isConnected ?? false);
+              if (network.isConnected) return revalidateUser();
+              else return fetchStorageUser();
+            }),
+            concatMap((value) =>
+              from(value).pipe(
+                tap((value) => {
+                  if (!value && !useUserStore.getState().user)
+                    router.push('/first-start');
+                }),
+              ),
+            ),
+          ),
+        ),
+      )
+      .subscribe(() => {});
 
     return () => {
       subscription.unsubscribe();

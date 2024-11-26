@@ -1,6 +1,5 @@
 import styled from 'styled-components/native';
 import { View } from '../../../components/Styled/View';
-import { BackgroundAnimation } from '../../../components/Background';
 import { usePathname } from 'expo-router';
 import { ShadowLinearGradient } from '../../../components/Gradient/ShadowLinearGradient';
 import React from 'react';
@@ -19,18 +18,6 @@ const ContentView = styled(View)`
   height: 100%;
 `;
 
-const BackgroundAnimationWrapper = styled(Reanimated.View)<{ hidden: boolean }>`
-  position: absolute;
-  top: 75%;
-  height: 100%;
-  right: -70%;
-  width: 250%;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none;
-  z-index: 10;
-`;
-
 const ChatShadow = styled(ShadowLinearGradient)`
   position: absolute;
   height: 100px;
@@ -41,17 +28,8 @@ const ChatShadow = styled(ShadowLinearGradient)`
 `;
 
 export default function ChatBot() {
-  const keyboardTranslateStyle = useKeyboardTranslateStyle();
-
   return (
     <PageRevealWrapper pagePath='/chat/chatBot'>
-      <BackgroundAnimationWrapper
-        style={keyboardTranslateStyle}
-        layout={Layout.duration(200)}
-        hidden={false}
-      >
-        <BackgroundAnimation />
-      </BackgroundAnimationWrapper>
       <ChatShadow />
       <ContentView>
         <MessagesHeader />

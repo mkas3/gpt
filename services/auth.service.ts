@@ -16,7 +16,7 @@ export const googleLogin = async () => {
 export const register = async (data: RequestUser) => {
   const response = await instance.post<ResponseUser>('user', data);
 
-  if (response.data && response.data.token)
+  if (response?.data && response.data.token)
     await SecureStore.setItemAsync(TOKEN_KEY, response.data.token);
 
   return response;
@@ -25,16 +25,20 @@ export const register = async (data: RequestUser) => {
 export const login = async (data: RequestUser) => {
   const response = await instance.post<ResponseUser>('auth/login', data);
 
-  if (response.data && response.data.token)
+  if (response?.data && response.data.token)
     await SecureStore.setItemAsync(TOKEN_KEY, response.data.token);
 
   return response;
 };
 
+export const logout = async () => {
+  await SecureStore.deleteItemAsync(TOKEN_KEY);
+}
+
 export const checkAuth = async () => {
   const response = await authInstance.get<ResponseUser>('auth');
 
-  if (response.data && response.data.token)
+  if (response?.data && response.data.token)
     await SecureStore.setItemAsync(TOKEN_KEY, response.data.token);
 
   return response;

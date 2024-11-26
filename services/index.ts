@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import {config} from 'rxjs';
 
 export const TOKEN_KEY = 'token';
 
@@ -17,5 +18,19 @@ const authInterceptor = async (config: any) => {
   )}`;
   return config;
 };
+
+instance.interceptors.response.use((response) => {
+  return response;
+}, (error) => {
+  Promise.reject(error);
+  return undefined;
+})
+
+authInstance.interceptors.response.use((response) => {
+  return response;
+}, (error) => {
+  Promise.reject(error);
+  return undefined;
+})
 
 authInstance.interceptors.request.use(authInterceptor);

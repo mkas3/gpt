@@ -1,7 +1,6 @@
 import { Title } from '../../components/Styled/Text/Title';
 import styled from 'styled-components/native';
 import { View } from '../../components/Styled/View';
-import { BackgroundAnimation } from '../../components/Background';
 import Reanimated, {
   Easing,
   Layout,
@@ -26,8 +25,9 @@ import { useUserStore } from '../../store/User/user.store';
 import { Controller, useForm } from 'react-hook-form';
 import { FormInput } from '../../components/Styled/Input/FormInput';
 import { useRouter } from 'expo-router';
-import {RequestUser} from '../../types/user.types';
-import {defaultTimingEasing} from '../../constants/animation';
+import { RequestUser } from '../../types/user.types';
+import { defaultTimingEasing } from '../../constants/animation';
+import { BackgroundSVGAnimation } from '../../components/Background/BackgroundSVGAnimation';
 
 type FormValues = RequestUser & {
   confirmPassword?: string;
@@ -41,17 +41,15 @@ const MainView = styled(View)`
 
 const TitleWrapper = styled(Reanimated.View)`
   position: absolute;
-  top: 0;
+  top: 40%;
   bottom: 0;
   right: 0;
   left: 0;
-  justify-content: center;
-  align-items: center;
   opacity: 0;
 `;
 
 const SignInKeyboardAvoidingView = styled(KeyboardAvoidingView)`
-  z-index: 10;
+  z-index: 100;
 `;
 
 const SignInView = styled(Reanimated.View)`
@@ -89,17 +87,9 @@ const WelcomeWrapper = styled(Reanimated.View)`
 const BackgroundAnimationWrapper = styled(View)`
   position: absolute;
   bottom: 45%;
-  height: 150%;
+  height: 100%;
   left: 0;
-  width: 250%;
-`;
-
-const BackgroundAnimationSecondaryWrapper = styled(View)`
-  position: absolute;
-  top: 45%;
-  height: 150%;
   right: 0;
-  width: 250%;
 `;
 
 export default function FirstStart() {
@@ -109,9 +99,9 @@ export default function FirstStart() {
   const [welcomeState, setWelcomeState] = useState(0);
   const titleOpacity = useSharedValue(0);
   const titleScale = useSharedValue(1);
-  const titleTop = useSharedValue(0);
+  const titleTranslateY = useSharedValue(0);
   const signInOpacity = useSharedValue(0);
-  const welcomeBottom = useSharedValue(-10);
+  const welcomeTranslateY = useSharedValue(-10);
   const setUser = useUserStore((state) => state.setUser);
   const isKeyboardOpen = useKeyboardOpen();
   const { control, handleSubmit, resetField, formState } =
@@ -119,8 +109,10 @@ export default function FirstStart() {
 
   const titleWrapperStyle = useAnimatedStyle(() => ({
     opacity: titleOpacity.value,
-    transform: [{ scale: titleScale.value }],
-    top: `${titleTop.value}%`,
+    transform: [
+      { scale: titleScale.value },
+      { translateY: titleTranslateY.value },
+    ],
   }));
 
   const signInStyle = useAnimatedStyle(() => ({
@@ -128,7 +120,7 @@ export default function FirstStart() {
   }));
 
   const welcomeStyle = useAnimatedStyle(() => ({
-    bottom: `${welcomeBottom.value}%`,
+    transform: [{ translateY: welcomeTranslateY.value }],
   }));
 
   const handleAuth = (data: FormValues) => {
@@ -162,26 +154,16 @@ export default function FirstStart() {
         duration: 3000,
         easing: defaultTimingEasing,
       }),
-      withTiming(
-        0,
-        {
-          duration: 3000,
-          easing: defaultTimingEasing,
-        },
-        () => {
-          runOnJS(setWelcomeState)(1);
-        },
-      ),
-      withTiming(
-        1,
-        {
-          duration: 3000,
-          easing: defaultTimingEasing,
-        },
-        () => {
-          runOnJS(setWelcomeState)(2);
-        },
-      ),
+      withTiming(0, {
+        duration: 3000,
+        easing: defaultTimingEasing,
+      }, () => {
+        runOnJS(setWelcomeState)(1);
+      }),
+      withTiming(1, {
+        duration: 3000,
+        easing: defaultTimingEasing,
+      }),
     );
     titleScale.value = withDelay(
       9000,
@@ -190,9 +172,9 @@ export default function FirstStart() {
         easing: defaultTimingEasing,
       }),
     );
-    titleTop.value = withDelay(
+    titleTranslateY.value = withDelay(
       9500,
-      withTiming(-80, {
+      withTiming(-750, {
         duration: 1000,
         easing: defaultTimingEasing,
       }),
@@ -204,9 +186,9 @@ export default function FirstStart() {
         easing: defaultTimingEasing,
       }),
     );
-    welcomeBottom.value = withDelay(
+    welcomeTranslateY.value = withDelay(
       9500,
-      withTiming(5, {
+      withTiming(-100, {
         duration: 1000,
         easing: defaultTimingEasing,
       }),
@@ -266,13 +248,8 @@ export default function FirstStart() {
         </WelcomeWrapper>
       )}
       <BackgroundAnimationWrapper>
-        <BackgroundAnimation />
+        <BackgroundSVGAnimation />
       </BackgroundAnimationWrapper>
-      {!isKeyboardOpen && (
-        <BackgroundAnimationSecondaryWrapper>
-          <BackgroundAnimation />
-        </BackgroundAnimationSecondaryWrapper>
-      )}
     </MainView>
   );
 }
